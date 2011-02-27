@@ -1,0 +1,19 @@
+name: TweakWarp
+main: com.guntherdw.bukkit.TweakWarp.TweakWarp
+version: 0.5
+commands:
+     warp:
+        description: Warps you to a specific place
+        usage: /<command> <name>
+     setwarp:
+        description: Creates a new warp
+        usage: /<command> <name>
+     removewarp:
+        description: Removes a warp
+        usage: /<command> <name>
+     listwarps:
+        description: Lists the current warps
+        usage: /<command>
+     reloadwarps:
+        description: Reloads the warp table
+        usage: /<command>
