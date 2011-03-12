@@ -186,7 +186,26 @@ public class TweakWarp extends JavaPlugin {
         } */
     }
 
+    public void initConfig()
+    {
+        try{
+            getConfiguration().setProperty("database", "databasename");
+            getConfiguration().setProperty("username", "database-username");
+            getConfiguration().setProperty("password", "database-password");
+        } catch (Throwable e)
+        {
+            log.severe("[TweakWarp] There was an exception while we were saving the config, be sure to doublecheck!");
+        }
+    }
+
     public void onEnable() {
+        if(getConfiguration() == null)
+        {
+            log.severe("[Homes] You have to configure me now, reboot the server after you're done!");
+            getDataFolder().mkdirs();
+            initConfig();
+            this.setEnabled(false);
+        }
         loadDriver();
         setupConnection();
         setupPermissions();
@@ -239,7 +258,7 @@ public class TweakWarp extends JavaPlugin {
                     player.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
                 }
             }
-            this.reloadWarpTable(false);
+            this.reloadWarpTable(true);
             return true;
         } else if(command.getName().equalsIgnoreCase("setwarp")
                 && check(player, "tweakwarp.setwarp")) {
@@ -271,7 +290,7 @@ public class TweakWarp extends JavaPlugin {
                     player.sendMessage(ChatColor.AQUA + "Found warp with name "+w.getName());
                     // public Location(org.bukkit.World world, double x, double y, double z, float yaw, float pitch) { /* compiled code */ }
                     Location loc = new Location(this.getServer().getWorld(w.getWorld()),
-                            w.getX(), w.getY(), w.getZ(), w.getPitch(), w.getYaw());
+                            w.getX(), w.getY() + 1, w.getZ(), w.getPitch(), w.getYaw());
                     player.teleportTo(loc);
                     player.sendMessage(ChatColor.AQUA + "WHOOOSH!");
                     log.info("[TweakWarp] "+player.getName()+" warped to "+w.getName()+"!");
