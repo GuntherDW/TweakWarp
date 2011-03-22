@@ -141,17 +141,20 @@ public class TweakWarp extends JavaPlugin {
     public void reloadWarpTable(boolean sql) {
         try {
 
-            if(sql) setupConnection();
+            if(sql)
+            {
+                setupConnection();
+            }
             Connection conn = getConnection();
             int count = 0;
-            warps = new HashMap<String, Warp>();
+            this.warps = new HashMap<String, Warp>();
             PreparedStatement st = null;
             ResultSet rs = null;
             st = conn.prepareStatement("SELECT name, x, y, z, rotX, rotY, world FROM warps");
             rs = st.executeQuery();
 
             while (rs.next()) {
-                warps.put(rs.getString(1), new Warp(rs.getDouble(2), rs.getDouble(3),
+                this.warps.put(rs.getString(1), new Warp(rs.getDouble(2), rs.getDouble(3),
                         rs.getDouble(4), rs.getFloat(5), rs.getFloat(6),rs.getString(1), rs.getString(7)));
                 count++;
             }
@@ -201,7 +204,7 @@ public class TweakWarp extends JavaPlugin {
     public void onEnable() {
         if(getConfiguration() == null)
         {
-            log.severe("[Homes] You have to configure me now, reboot the server after you're done!");
+            log.severe("[TweakWarp] You have to configure me now, reboot the server after you're done!");
             getDataFolder().mkdirs();
             initConfig();
             this.setEnabled(false);
@@ -235,77 +238,105 @@ public class TweakWarp extends JavaPlugin {
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings)
     {
-        Player player = (Player) commandSender;
+
         if(command.getName().equalsIgnoreCase("listwarps")) {
-            player.sendMessage(ChatColor.GREEN + "Current warps:");
-            /* String msg = "";
-            for(String m : warps.keySet())
-            {
-                msg += m+", ";
-            }
-            msg = msg.substring(0, msg.length()-2); */
+            commandSender.sendMessage(ChatColor.GREEN + "Current warps:");
             String msg = this.getWarpList();
-            player.sendMessage(msg);
+            commandSender.sendMessage(msg);
             return true;
-        } else if(command.getName().equalsIgnoreCase("removewarp")
-                && check(player, "tweakwarp.removewarp")) {
-            String warpname = strings[0];
-            if(warps.containsKey(warpname)) {
-                if(removeWarp(warpname))
-                {
-                    player.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' removed!");
-                } else {
-                    player.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
-                }
-            }
-            this.reloadWarpTable(true);
-            return true;
-        } else if(command.getName().equalsIgnoreCase("setwarp")
-                && check(player, "tweakwarp.setwarp")) {
-            String warpname = strings[0];
-            Warp tempwarp = new Warp(player.getLocation().getX(),
-                                     player.getLocation().getY(),
-                                     player.getLocation().getZ(),
-                                     player.getLocation().getPitch(),
-                                     player.getLocation().getYaw(),
-                                     warpname,
-                                     player.getLocation().getWorld().getName());
-            if(addWarp(warpname, tempwarp))
+        } else if(command.getName().equalsIgnoreCase("removewarp")) {
+            if(commandSender instanceof Player)
             {
-                log.info("[TweakWarp] Warp '"+warpname+"' created by "+player.getName()+"!");
-                player.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' created!");
+                Player player = (Player) commandSender;
+                if(check(player, "tweakwarp.removewarp"))
+                {
+                String warpname = strings[0];
+                if(warps.containsKey(warpname)) {
+                    if(removeWarp(warpname))
+                    {
+                        player.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' removed!");
+                    } else {
+                        player.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
+                    }
+                }
+                } else {
+                    player.sendMessage(ChatColor.RED + "You do not have the correct permissions!");
+                }
+                this.reloadWarpTable(true);
+                return true;
             } else {
-                player.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
+                commandSender.sendMessage("You need to be a player to remove a warp!");
             }
-            this.reloadWarpTable(false);
+            } else if(command.getName().equalsIgnoreCase("setwarp")) {
+                if(commandSender instanceof Player)
+                {
+                    Player player = (Player) commandSender;
+                    if(check(player, "tweakwarp.setwarp"))
+                    {
+                        String warpname = strings[0];
+                        Warp tempwarp = new Warp(player.getLocation().getX(),
+                                                 player.getLocation().getY(),
+                                                 player.getLocation().getZ(),
+                                                 player.getLocation().getYaw(),
+                                                 player.getLocation().getPitch(),
+                                                 warpname,
+                                                 player.getLocation().getWorld().getName());
+                        if(addWarp(warpname, tempwarp))
+                        {
+                            log.info("[TweakWarp] Warp '"+warpname+"' created by "+player.getName()+"!");
+                            player.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' created!");
+                        } else {
+                            player.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
+                        }
+                            this.reloadWarpTable(false);
+                    } else {
+                        player.sendMessage("You do not have the correct permissions");
+                    }
+                } else {
+                    commandSender.sendMessage("You need to be a player to set a warp!");
+                }
             return true;
         } else if(command.getName().equalsIgnoreCase("warp")) {
-            if(strings.length==1)
+            if(commandSender instanceof Player)
             {
-                String warpname = strings[0];
-                Warp w = searchWarp(warpname);
-
-                if(w != null)
+                Player player = (Player) commandSender;
+                if(strings.length==1)
                 {
-                    player.sendMessage(ChatColor.AQUA + "Found warp with name "+w.getName());
-                    // public Location(org.bukkit.World world, double x, double y, double z, float yaw, float pitch) { /* compiled code */ }
-                    Location loc = new Location(this.getServer().getWorld(w.getWorld()),
-                            w.getX(), w.getY() + 1, w.getZ(), w.getPitch(), w.getYaw());
-                    player.teleportTo(loc);
-                    player.sendMessage(ChatColor.AQUA + "WHOOOSH!");
-                    log.info("[TweakWarp] "+player.getName()+" warped to "+w.getName()+"!");
+                    String warpname = strings[0];
+                    Warp w = searchWarp(warpname);
+
+                    if(w != null)
+                    {
+                        player.sendMessage(ChatColor.AQUA + "Found warp with name "+w.getName());
+                        // public Location(org.bukkit.World world, double x, double y, double z, float yaw, float pitch) { /* compiled code */ }
+                        Location loc = new Location(this.getServer().getWorld(w.getWorld()),
+                                w.getX(), w.getY() + 1, w.getZ(), w.getPitch(), w.getYaw());
+                        player.teleportTo(loc);
+                        player.sendMessage(ChatColor.AQUA + "WHOOOSH!");
+                        log.info("[TweakWarp] "+player.getName()+" warped to "+w.getName()+"!");
+                    } else {
+                        log.info("[TweakWarp] "+player.getName()+" tried to warp to '"+warpname+"'!");
+                        player.sendMessage(ChatColor.AQUA + "Warp not found!");
+                    }
                 } else {
-                    log.info("[TweakWarp] "+player.getName()+" tried to warp to '"+warpname+"'!");
-                    player.sendMessage(ChatColor.AQUA + "Warp not found!");
+                    player.sendMessage(ChatColor.AQUA + command.getUsage());
                 }
             } else {
-                player.sendMessage(ChatColor.AQUA + command.getUsage());
+                commandSender.sendMessage("You need to be a player to warp!");
             }
             return true;
-        } else if(command.getName().equalsIgnoreCase("reloadwarps")
-                && check(player, "tweakwarp.reloadwarps")) {
-            log.info("[TweakWarp] "+player.getName() +" issued /reloadwarps!");
-            player.sendMessage(ChatColor.GREEN + "Reloading warps table");
+        } else if(command.getName().equalsIgnoreCase("reloadwarps")) {
+            if(commandSender instanceof Player)
+            {
+                Player player = (Player) commandSender;
+                if(!check(player, "tweakwarp.reloadwarps"))
+                    return true;
+                log.info("[TweakWarp] "+player.getName()+" issued /reloadwarps!");
+            } else {
+                log.info("[TweakWarp] console issued /reloadwarps!");
+            }
+
+            commandSender.sendMessage(ChatColor.GREEN + "Reloading warps table");
             this.reloadWarpTable(true);
 
             return true;
