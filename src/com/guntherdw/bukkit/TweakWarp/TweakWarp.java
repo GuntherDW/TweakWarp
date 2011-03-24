@@ -173,20 +173,7 @@ public class TweakWarp extends JavaPlugin {
     public void setupConnection() {
         this.db =  getConfiguration().getString("database");
         this.user = getConfiguration().getString("username");
-        this.pass = getConfiguration().getString("password"); /*
-        try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-
-            conn = DriverManager.getConnection(url, user, pass);
-        } catch (ClassNotFoundException e) {
-            log.severe(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-        } catch (InstantiationException e) {
-            log.severe(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IllegalAccessException e) {
-            log.severe(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-        } catch (SQLException e) {
-            log.severe(e.getMessage());  //To change body of catch statement use File | Settings | File Templates.
-        } */
+        this.pass = getConfiguration().getString("password");
     }
 
     public void initConfig()
@@ -311,7 +298,7 @@ public class TweakWarp extends JavaPlugin {
                         // public Location(org.bukkit.World world, double x, double y, double z, float yaw, float pitch) { /* compiled code */ }
                         Location loc = new Location(this.getServer().getWorld(w.getWorld()),
                                 w.getX(), w.getY() + 1, w.getZ(), w.getPitch(), w.getYaw());
-                        player.teleportTo(loc);
+                        player.teleport(loc);
                         player.sendMessage(ChatColor.AQUA + "WHOOOSH!");
                         log.info("[TweakWarp] "+player.getName()+" warped to "+w.getName()+"!");
                     } else {
