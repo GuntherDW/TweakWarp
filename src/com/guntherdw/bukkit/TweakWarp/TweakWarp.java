@@ -1,6 +1,5 @@
 package com.guntherdw.bukkit.TweakWarp;
 
-import java.awt.datatransfer.StringSelection;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Logger;
@@ -39,7 +38,7 @@ public class TweakWarp extends JavaPlugin {
                 return warp;
             }
         }
-        return null;
+        return warp;
     }
 
     private void loadDriver() {
@@ -102,7 +101,6 @@ public class TweakWarp extends JavaPlugin {
         } catch(SQLException e)
         {
             log.warning("[TweakWarp] removeWarp error occurred : " + e.getStackTrace());
-            // getServer().getPlayer("GuntherDW").sendMessage("removewarp:" + e.getStackTrace().toString());
             return false;
         }
     }
@@ -132,7 +130,6 @@ public class TweakWarp extends JavaPlugin {
             return true;
         } catch(SQLException e)
         {
-            // getServer().getPlayer("GuntherDW").sendMessage("addwarp:" + e.getStackTrace().toString());
             log.warning("[TweakWarp] addWarp error occurred : " + e.getStackTrace());
             return false;
         }
@@ -150,12 +147,12 @@ public class TweakWarp extends JavaPlugin {
             this.warps = new HashMap<String, Warp>();
             PreparedStatement st = null;
             ResultSet rs = null;
-            st = conn.prepareStatement("SELECT name, x, y, z, rotX, rotY, world FROM warps");
+            st = conn.prepareStatement("SELECT name, `x`, `y`, `z`, `rotX`, `rotY`, `world`, `group` FROM warps");
             rs = st.executeQuery();
 
             while (rs.next()) {
                 this.warps.put(rs.getString(1), new Warp(rs.getDouble(2), rs.getDouble(3),
-                        rs.getDouble(4), rs.getFloat(5), rs.getFloat(6),rs.getString(1), rs.getString(7)));
+                        rs.getDouble(4), rs.getFloat(5), rs.getFloat(6),rs.getString(1), rs.getString(7), rs.getString(8)));
                 count++;
             }
             log.info("[TweakWarp] Loaded " + count + " warps!");
@@ -287,26 +284,30 @@ public class TweakWarp extends JavaPlugin {
             if(commandSender instanceof Player)
             {
                 Player player = (Player) commandSender;
-                if(strings.length==1)
+                if(check(player, "tweakwarp.warp"))
                 {
-                    String warpname = strings[0];
-                    Warp w = searchWarp(warpname);
-
-                    if(w != null)
+                    if(strings.length==1)
                     {
-                        player.sendMessage(ChatColor.AQUA + "Found warp with name "+w.getName());
-                        // public Location(org.bukkit.World world, double x, double y, double z, float yaw, float pitch) { /* compiled code */ }
-                        Location loc = new Location(this.getServer().getWorld(w.getWorld()),
-                                w.getX(), w.getY() + 1, w.getZ(), w.getPitch(), w.getYaw());
-                        player.teleport(loc);
-                        player.sendMessage(ChatColor.AQUA + "WHOOOSH!");
-                        log.info("[TweakWarp] "+player.getName()+" warped to "+w.getName()+"!");
+                        String warpname = strings[0];
+                        Warp w = searchWarp(warpname);
+
+                        if(w != null)
+                        {
+                            player.sendMessage(ChatColor.AQUA + "Found warp with name "+w.getName());
+                            Location loc = new Location(this.getServer().getWorld(w.getWorld()),
+                                    w.getX(), w.getY() + 1, w.getZ(), w.getPitch(), w.getYaw());
+                            player.teleport(loc);
+                            player.sendMessage(ChatColor.AQUA + "WHOOOSH!");
+                            log.info("[TweakWarp] "+player.getName()+" warped to "+w.getName()+"!");
+                        } else {
+                            log.info("[TweakWarp] "+player.getName()+" tried to warp to '"+warpname+"'!");
+                            player.sendMessage(ChatColor.AQUA + "Warp not found!");
+                        }
                     } else {
-                        log.info("[TweakWarp] "+player.getName()+" tried to warp to '"+warpname+"'!");
-                        player.sendMessage(ChatColor.AQUA + "Warp not found!");
+                        player.sendMessage(ChatColor.AQUA + command.getUsage());
                     }
                 } else {
-                    player.sendMessage(ChatColor.AQUA + command.getUsage());
+                    player.sendMessage("You don't have permission to warp!");
                 }
             } else {
                 commandSender.sendMessage("You need to be a player to warp!");

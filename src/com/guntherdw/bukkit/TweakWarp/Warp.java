@@ -8,6 +8,11 @@ public class Warp {
     private float Pitch,Yaw;
     private String World;
     private String Name;
+    private String Group;
+
+    public String getGroup() {
+        return Group;
+    }
 
     public String getName() {
         return Name;
@@ -74,5 +79,17 @@ public class Warp {
         Yaw = yaw;
         World = world;
         Name = name;
+    }
+
+    public Warp(double x, double y, double z, float pitch, float yaw, String name, String world, String group) {
+
+        X = x;
+        Y = y;
+        Z = z;
+        Pitch = pitch;
+        Yaw = yaw;
+        World = world;
+        Name = name;
+        Group = group;
     }
 }
