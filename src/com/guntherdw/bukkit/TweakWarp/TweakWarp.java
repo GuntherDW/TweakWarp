@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.logging.Logger;
 
+import com.guntherdw.bukkit.tweakcraft.TweakcraftUtils;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -26,6 +27,9 @@ public class TweakWarp extends JavaPlugin {
     
     public static Permissions perm = null;
     public Map<String, Warp> warps;
+
+    public List<String> saveWarps;
+    public TweakcraftUtils tweakcraftutils;
 
     public Warp searchWarp(String warpname)
     {
@@ -197,10 +201,22 @@ public class TweakWarp extends JavaPlugin {
         loadDriver();
         setupConnection();
         setupPermissions();
+        setupTCUtils();
+        saveWarps = new ArrayList<String>();
         reloadWarpTable(false);
         PluginDescriptionFile pdfFile = this.getDescription();
         log.info("[TweakWarp] TweakWarp v"+pdfFile.getVersion()+" enabled!");
         //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public void setupTCUtils() {
+        Plugin plugin = this.getServer().getPluginManager().getPlugin("TweakcraftUtils");
+
+        if (tweakcraftutils == null) {
+            if (plugin != null) {
+                tweakcraftutils = (TweakcraftUtils) plugin;
+            }
+        }
     }
 
     public void setupPermissions() {
@@ -297,6 +313,11 @@ public class TweakWarp extends JavaPlugin {
                             player.sendMessage(ChatColor.AQUA + "Found warp with name "+w.getName());
                             Location loc = new Location(this.getServer().getWorld(w.getWorld()),
                                     w.getX(), w.getY() + 1, w.getZ(), w.getPitch(), w.getYaw());
+                            if(tweakcraftutils!=null) {
+                                if(saveWarps.contains(player.getName())) {
+                                    tweakcraftutils.getTelehistory().addHistory(player.getName(), player.getLocation());
+                                }
+                            }
                             player.teleport(loc);
                             player.sendMessage(ChatColor.AQUA + "WHOOOSH!");
                             log.info("[TweakWarp] "+player.getName()+" warped to "+w.getName()+"!");
@@ -329,6 +350,21 @@ public class TweakWarp extends JavaPlugin {
             this.reloadWarpTable(true);
 
             return true;
+        } else if(command.getName().equals("warpback")) {
+            if(commandSender instanceof Player) {
+                Player p = (Player) commandSender;
+                if(!check(p, "tweakcraftutils.tpback"))
+                    return true;
+                if(!saveWarps.contains(p.getName())) {
+                    p.sendMessage(ChatColor.GOLD+"Warping will save a TPBack instance!");
+                    saveWarps.add(p.getName());
+                } else {
+                    p.sendMessage(ChatColor.GOLD+"Warping will no longer save a TPBack instance!");
+                    saveWarps.remove(p.getName());
+                }
+            } else {
+                commandSender.sendMessage("Consoles need a tp history nowadays?");
+            }
         }
         return false;
     }

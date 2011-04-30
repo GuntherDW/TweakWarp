@@ -1,6 +1,6 @@
 name: TweakWarp
 main: com.guntherdw.bukkit.TweakWarp.TweakWarp
-version: 0.5
+version: 1.1
 commands:
      warp:
         description: Warps you to a specific place
@@ -21,3 +21,7 @@ commands:
         description: Reloads the warp table
         usage: /<command>
         _permission: tweakwarp.reloadwarps
+     warpback:
+        description: Toggle warp saving for tpback
+        usage: /<command>
+        _permission: tweakcraftutils.tpback
