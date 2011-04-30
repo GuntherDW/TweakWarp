@@ -5,15 +5,19 @@ commands:
      warp:
         description: Warps you to a specific place
         usage: /<command> <name>
+        _permission: tweakwarp.warp
      setwarp:
         description: Creates a new warp
         usage: /<command> <name>
+        _permission: tweakwarp.setwarp
      removewarp:
         description: Removes a warp
         usage: /<command> <name>
+        _permission: tweakwarp.removewarp
      listwarps:
         description: Lists the current warps
         usage: /<command>
      reloadwarps:
         description: Reloads the warp table
         usage: /<command>
+        _permission: tweakwarp.reloadwarps
