@@ -233,7 +233,8 @@ public class TweakWarp extends JavaPlugin {
         if (perm == null) {
             return true;
         } else {
-            return perm.Security.permission(player, permNode);
+            return player.isOp() ||
+                   perm.Security.permission(player, permNode);
         }
     }
 
@@ -353,8 +354,11 @@ public class TweakWarp extends JavaPlugin {
         } else if(command.getName().equals("warpback")) {
             if(commandSender instanceof Player) {
                 Player p = (Player) commandSender;
-                if(!check(p, "tweakcraftutils.tpback"))
+                if(!check(p, "tweakcraftutils.tpback")) {
+                    p.sendMessage("You don't have permission to tpback, so this would be useless!");
                     return true;
+                }
+
                 if(!saveWarps.contains(p.getName())) {
                     p.sendMessage(ChatColor.GOLD+"Warping will save a TPBack instance!");
                     saveWarps.add(p.getName());
@@ -365,6 +369,7 @@ public class TweakWarp extends JavaPlugin {
             } else {
                 commandSender.sendMessage("Consoles need a tp history nowadays?");
             }
+            return true;
         }
         return false;
     }
