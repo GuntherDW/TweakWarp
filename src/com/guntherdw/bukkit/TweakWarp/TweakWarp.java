@@ -315,7 +315,7 @@ public class TweakWarp extends JavaPlugin {
                             Location loc = new Location(this.getServer().getWorld(w.getWorld()),
                                     w.getX(), w.getY() + 1, w.getZ(), w.getPitch(), w.getYaw());
                             if(tweakcraftutils!=null) {
-                                if(saveWarps.contains(player.getName())) {
+                                if(!saveWarps.contains(player.getName())) {
                                     tweakcraftutils.getTelehistory().addHistory(player.getName(), player.getLocation());
                                 }
                             }
@@ -359,11 +359,11 @@ public class TweakWarp extends JavaPlugin {
                     return true;
                 }
 
-                if(!saveWarps.contains(p.getName())) {
-                    p.sendMessage(ChatColor.GOLD+"Warping will save a TPBack instance!");
+                if(saveWarps.contains(p.getName())) {
+                    p.sendMessage(ChatColor.GOLD+"Warping will no longer save a TPBack instance!");
                     saveWarps.add(p.getName());
                 } else {
-                    p.sendMessage(ChatColor.GOLD+"Warping will no longer save a TPBack instance!");
+                    p.sendMessage(ChatColor.GOLD+"Warping will save a TPBack instance!");
                     saveWarps.remove(p.getName());
                 }
             } else {
