@@ -70,7 +70,7 @@ public class Warp {
         Yaw = yaw;
     }
 
-    public Warp(double x, double y, double z, float pitch, float yaw, String name, String world) {
+    /*public Warp(double x, double y, double z, float pitch, float yaw, String name, String world) {
 
         X = x;
         Y = y;
@@ -79,7 +79,7 @@ public class Warp {
         Yaw = yaw;
         World = world;
         Name = name;
-    }
+    }*/
 
     public Warp(double x, double y, double z, float pitch, float yaw, String name, String world, String group) {
 
@@ -89,7 +89,10 @@ public class Warp {
         Pitch = pitch;
         Yaw = yaw;
         World = world;
-        Name = name;
-        Group = group;
+        Name = name.trim().toLowerCase();
+        if(group == null || group.trim().equals(""))
+        	Group = TweakWarp.DEFAULT_GROUP;
+        else
+        	Group = group.trim().toLowerCase();
     }
 }

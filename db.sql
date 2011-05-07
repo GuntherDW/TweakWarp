@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS `warps` (
   `rotY` float NOT NULL,
   `world` varchar(25) NOT NULL DEFAULT 'world',
   `group` varchar(64) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE(`name`,`group`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
