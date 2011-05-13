@@ -228,7 +228,7 @@ public class TweakWarp extends JavaPlugin {
                 commandSender.sendMessage("You need to be a player to set a warp!");
             }
             return true;
-        } /* else if(command.getName().equalsIgnoreCase("warp")) {
+        } else if(command.getName().equalsIgnoreCase("warp")) {
             if(commandSender instanceof Player)
             {
                 Player player = (Player) commandSender;
@@ -266,7 +266,7 @@ public class TweakWarp extends JavaPlugin {
                 commandSender.sendMessage("You need to be a player to warp!");
             }
             return true;
-        } */ else if(command.getName().equalsIgnoreCase("reloadwarps")) {
+        } else if(command.getName().equalsIgnoreCase("reloadwarps")) {
             if(commandSender instanceof Player)
             {
                 Player player = (Player) commandSender;
@@ -281,7 +281,7 @@ public class TweakWarp extends JavaPlugin {
             this.reloadWarpTable();
 
             return true;
-        } /*else if(command.getName().equals("warpback")) {
+        } else if(command.getName().equals("warpback")) {
             if(commandSender instanceof Player) {
                 Player p = (Player) commandSender;
                 if(!check(p, "tweakcraftutils.tpback")) {
@@ -300,7 +300,7 @@ public class TweakWarp extends JavaPlugin {
                 commandSender.sendMessage("Consoles need a tp history nowadays?");
             }
             return true;
-        } */
+        }
         return false;
     }
 }
