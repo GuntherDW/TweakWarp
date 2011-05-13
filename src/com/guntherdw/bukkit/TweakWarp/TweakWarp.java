@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 
 import com.guntherdw.bukkit.tweakcraft.TweakcraftUtils;
 import com.nijikokun.bukkit.Permissions.Permissions;
+import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
+import com.sun.xml.internal.ws.api.server.InstanceResolver;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -14,6 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import sun.reflect.generics.tree.ReturnType;
+
+import javax.jnlp.ExtendedService;
+import javax.persistence.PersistenceException;
 
 
 /**
@@ -22,11 +28,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class TweakWarp extends JavaPlugin {
 
     private final static Logger log = Logger.getLogger("Minecraft");
-    private String dbhost, db, user, pass;
     // private static Connection conn;
-    
+
     public static Permissions perm = null;
-    public Map<String, Warp> warps;
+    public Map<String, Warp> warps = new HashMap<String, Warp>();
 
     public List<String> saveWarps;
     public TweakcraftUtils tweakcraftutils;
@@ -45,26 +50,7 @@ public class TweakWarp extends JavaPlugin {
         return warp;
     }
 
-    private void loadDriver() {
-        final String driverName = "com.mysql.jdbc.Driver";
-        try {
-            Class.forName(driverName);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            //return null;
-        }
-    }
 
-    private Connection getConnection()
-    {
-        try {
-            String url = "jdbc:mysql://"+dbhost+":3306/" + db;
-            return DriverManager.getConnection(url + "?autoReconnect=true&user=" + user + "&password=" + pass);
-        } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            return null;
-        }
-    }
 
     public String getWarpList()
     {
@@ -84,128 +70,67 @@ public class TweakWarp extends JavaPlugin {
         return msg;
     }
 
-    public boolean removeWarp(String warpname)
-    {
-        try{
-            Connection conn = getConnection();
-            PreparedStatement st = null;
-            ResultSet rs = null;
-            st = conn.prepareStatement("SELECT name, world FROM warps WHERE name = ?");
-            st.setString(1, warpname);
-            rs = st.executeQuery();
-            if(rs.next()) // found warp with the exact same name
-            {
-                st = conn.prepareStatement("DELETE FROM warps WHERE name = ?");
-                st.setString(1, warpname);
-                st.executeUpdate();
-                return true;
-            } else {
-                return false;
-            }
-        } catch(SQLException e)
-        {
-            log.warning("[TweakWarp] removeWarp error occurred : " + e.getStackTrace());
+    public boolean removeWarp(String warpname) {
+        Warp w = getDatabase().find(Warp.class).where().ieq("name", warpname).findUnique();
+        if(w != null) {
+            getDatabase().delete(w);
+            return true;
+        } else {
             return false;
         }
     }
 
     public boolean addWarp(String warpname, Warp warp)
     {
-        try{
-            Connection conn = getConnection();
-            PreparedStatement st = null;
-            ResultSet rs = null;
-            st = conn.prepareStatement("SELECT name, world FROM warps WHERE name = ?");
-            st.setString(1, warpname);
-            rs = st.executeQuery();
-            if(rs.next()) // found warp with the exact same name
-            {
-                removeWarp(warpname);
-            }
-            st = conn.prepareStatement("INSERT INTO warps (name,x,y,z,rotX,rotY,world) VALUES (?,?,?,?,?,?,?)");
-            st.setString(1, warpname);
-            st.setDouble(2, warp.getX());
-            st.setDouble(3, warp.getY());
-            st.setDouble(4, warp.getZ());
-            st.setFloat(5, warp.getPitch());
-            st.setFloat(6, warp.getYaw());
-            st.setString(7, warp.getWorld());
-            st.executeUpdate();
-            return true;
-        } catch(SQLException e)
-        {
-            log.warning("[TweakWarp] addWarp error occurred : " + e.getStackTrace());
-            return false;
+        if(warps.containsKey(warpname)) {
+            this.getDatabase().delete(warps.get(warpname));
         }
+        this.getDatabase().save(warp);
+        warps.put(warpname, warp);
+        return true;
     }
 
-    public void reloadWarpTable(boolean sql) {
-        try {
-
-            if(sql)
-            {
-                setupConnection();
-            }
-            Connection conn = getConnection();
-            int count = 0;
-            this.warps = new HashMap<String, Warp>();
-            PreparedStatement st = null;
-            ResultSet rs = null;
-            st = conn.prepareStatement("SELECT name, `x`, `y`, `z`, `rotX`, `rotY`, `world`, `group` FROM warps");
-            rs = st.executeQuery();
-
-            while (rs.next()) {
-                this.warps.put(rs.getString(1), new Warp(rs.getDouble(2), rs.getDouble(3),
-                        rs.getDouble(4), rs.getFloat(5), rs.getFloat(6),rs.getString(1), rs.getString(7), rs.getString(8)));
-                count++;
-            }
-            log.info("[TweakWarp] Loaded " + count + " warps!");
-
-        } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    public void reloadWarpTable() {
+        List<Warp> warpies =  this.getDatabase().find(Warp.class).findList();
+        warps.clear();
+        for(Warp w : warpies) {
+            warps.put(w.getName(), w);
         }
     }
 
     public void onDisable() {
         log.info("[TweakWarp] Shutting down!");
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void setupConnection() {
-        this.dbhost = getConfiguration().getString("dbhost");
-        this.db =  getConfiguration().getString("database");
-        this.user = getConfiguration().getString("username");
-        this.pass = getConfiguration().getString("password");
-    }
-
-    public void initConfig()
-    {
-        try{
-            getConfiguration().setProperty("database", "databasename");
-            getConfiguration().setProperty("username", "database-username");
-            getConfiguration().setProperty("password", "database-password");
-        } catch (Throwable e)
-        {
-            log.severe("[TweakWarp] There was an exception while we were saving the config, be sure to doublecheck!");
+    private void setupDatabase() {
+        try {
+            getDatabase().find(Warp.class).findRowCount();
+        } catch (PersistenceException ex) {
+            System.out.println("Installing database for " + getDescription().getName() + " due to first time usage");
+            installDDL();
         }
+    }
+
+    @Override
+    public List<Class<?>> getDatabaseClasses() {
+        List<Class<?>> list = new ArrayList<Class<?>>();
+        list.add(Warp.class);
+        return list;
     }
 
     public void onEnable() {
-        if(getConfiguration() == null)
-        {
-            log.severe("[TweakWarp] You have to configure me now, reboot the server after you're done!");
-            getDataFolder().mkdirs();
-            initConfig();
-            this.setEnabled(false);
-        }
-        loadDriver();
-        setupConnection();
+
+
         setupPermissions();
         setupTCUtils();
+
         saveWarps = new ArrayList<String>();
-        reloadWarpTable(false);
+        // reloadWarpTable(false);
+        setupDatabase();
+        reloadWarpTable();
         PluginDescriptionFile pdfFile = this.getDescription();
         log.info("[TweakWarp] TweakWarp v"+pdfFile.getVersion()+" enabled!");
+
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -234,7 +159,7 @@ public class TweakWarp extends JavaPlugin {
             return true;
         } else {
             return player.isOp() ||
-                   perm.Security.permission(player, permNode);
+                    perm.Security.permission(player, permNode);
         }
     }
 
@@ -247,58 +172,63 @@ public class TweakWarp extends JavaPlugin {
             commandSender.sendMessage(msg);
             return true;
         } else if(command.getName().equalsIgnoreCase("removewarp")) {
+            // if(commandSender instanceof Player)
+            // {
+            // Player player = (Player) commandSender;
+            if(commandSender instanceof Player)
+                if(!(check((Player)commandSender, "tweakwarp.removewarp"))) {
+                    commandSender.sendMessage(ChatColor.RED+"You do not have the correct permission!");
+                    return true;
+                }
+
+            String warpname = strings[0];
+            if(warps.containsKey(warpname)) {
+                if(removeWarp(warpname))
+                {
+                    commandSender.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' removed!");
+                } else {
+                    commandSender.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
+                }
+            } else {
+                commandSender.sendMessage(ChatColor.AQUA + "Warp with name '"+warpname+"' not found!");
+            }
+
+            this.reloadWarpTable();
+            return true;
+            /* } else {
+                commandSender.sendMessage("You need to be a player to remove a warp!");
+            } */
+        } else if(command.getName().equalsIgnoreCase("setwarp")) {
             if(commandSender instanceof Player)
             {
                 Player player = (Player) commandSender;
-                if(check(player, "tweakwarp.removewarp"))
+                if(check(player, "tweakwarp.setwarp"))
                 {
-                String warpname = strings[0];
-                if(warps.containsKey(warpname)) {
-                    if(removeWarp(warpname))
+                    String warpname = strings[0];
+                    Warp tempwarp = new Warp();
+                    tempwarp.construct(player.getLocation().getX(),
+                            player.getLocation().getY(),
+                            player.getLocation().getZ(),
+                            player.getLocation().getYaw(),
+                            player.getLocation().getPitch(),
+                            warpname,
+                            player.getLocation().getWorld().getName());
+                    if(addWarp(warpname, tempwarp))
                     {
-                        player.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' removed!");
+                        log.info("[TweakWarp] Warp '"+warpname+"' created by "+player.getName()+"!");
+                        player.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' created!");
                     } else {
                         player.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
                     }
-                }
+                    this.reloadWarpTable();
                 } else {
-                    player.sendMessage(ChatColor.RED + "You do not have the correct permissions!");
+                    player.sendMessage("You do not have the correct permissions");
                 }
-                this.reloadWarpTable(true);
-                return true;
             } else {
-                commandSender.sendMessage("You need to be a player to remove a warp!");
+                commandSender.sendMessage("You need to be a player to set a warp!");
             }
-            } else if(command.getName().equalsIgnoreCase("setwarp")) {
-                if(commandSender instanceof Player)
-                {
-                    Player player = (Player) commandSender;
-                    if(check(player, "tweakwarp.setwarp"))
-                    {
-                        String warpname = strings[0];
-                        Warp tempwarp = new Warp(player.getLocation().getX(),
-                                                 player.getLocation().getY(),
-                                                 player.getLocation().getZ(),
-                                                 player.getLocation().getYaw(),
-                                                 player.getLocation().getPitch(),
-                                                 warpname,
-                                                 player.getLocation().getWorld().getName());
-                        if(addWarp(warpname, tempwarp))
-                        {
-                            log.info("[TweakWarp] Warp '"+warpname+"' created by "+player.getName()+"!");
-                            player.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' created!");
-                        } else {
-                            player.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
-                        }
-                            this.reloadWarpTable(false);
-                    } else {
-                        player.sendMessage("You do not have the correct permissions");
-                    }
-                } else {
-                    commandSender.sendMessage("You need to be a player to set a warp!");
-                }
             return true;
-        } else if(command.getName().equalsIgnoreCase("warp")) {
+        } /* else if(command.getName().equalsIgnoreCase("warp")) {
             if(commandSender instanceof Player)
             {
                 Player player = (Player) commandSender;
@@ -336,7 +266,7 @@ public class TweakWarp extends JavaPlugin {
                 commandSender.sendMessage("You need to be a player to warp!");
             }
             return true;
-        } else if(command.getName().equalsIgnoreCase("reloadwarps")) {
+        } */ else if(command.getName().equalsIgnoreCase("reloadwarps")) {
             if(commandSender instanceof Player)
             {
                 Player player = (Player) commandSender;
@@ -348,10 +278,10 @@ public class TweakWarp extends JavaPlugin {
             }
 
             commandSender.sendMessage(ChatColor.GREEN + "Reloading warps table");
-            this.reloadWarpTable(true);
+            this.reloadWarpTable();
 
             return true;
-        } else if(command.getName().equals("warpback")) {
+        } /*else if(command.getName().equals("warpback")) {
             if(commandSender instanceof Player) {
                 Player p = (Player) commandSender;
                 if(!check(p, "tweakcraftutils.tpback")) {
@@ -370,7 +300,7 @@ public class TweakWarp extends JavaPlugin {
                 commandSender.sendMessage("Consoles need a tp history nowadays?");
             }
             return true;
-        }
+        } */
         return false;
     }
 }
