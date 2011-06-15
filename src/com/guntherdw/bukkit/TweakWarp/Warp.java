@@ -7,7 +7,9 @@ import com.avaje.ebean.validation.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.jar.Attributes;
+
+import org.bukkit.Location;
+import org.bukkit.Server;
 
 /**
  * @author GuntherDW
@@ -21,144 +23,159 @@ public class Warp {
 
     @Length(max=45)
     @NotNull
-    private String Name;
+    private String name;
 
     @NotNull
-    private double X;
+    private double x;
 
     @NotNull
-    private double Y;
+    private double y;
 
     @NotNull
-    private double Z;
+    private double z;
 
     @NotNull
-    private float Pitch;
+    private float pitch;
 
     @NotNull
-    private float Yaw;
+    private float yaw;
 
     @Length(max=45)
     @NotEmpty
-    private String World;
+    private String world;
 
-    @Length(max=45)
-    private String UserGroup;
+    @Length(max=100)
+    @NotNull
+    private String warpgroup;
+    
+    @Length(max=100)
+    @NotNull
+    private String accessgroup;
 
-    public String getUserGroup() {
-        return UserGroup;
+    /**
+     *  Default contructor for persistence manager.
+     */
+	public Warp() {
+		
+	}
+	
+    public Warp(double x, double y, double z, float pitch, float yaw, String name, String world, String warpgroup, String accessgroup) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.pitch = pitch;
+        this.yaw = yaw;
+        this.name = name.toLowerCase();
+        this.world = world;
+        this.warpgroup = warpgroup.toLowerCase();
+        if(this.warpgroup.trim().equals("")) this.warpgroup = TweakWarp.DEFAULT_WARP_GROUP;
+        this.accessgroup = accessgroup.toLowerCase();
+    }
+    
+    public Warp(Location location, String name, String warpgroup, String accessgroup) {
+    	this(location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw(), name, location.getWorld().getName(), warpgroup, accessgroup);
     }
 
-    public void setUserGroup(String userGroup) {
-        UserGroup = userGroup;
+    public Location getLocation(Server server) {
+    	return new Location(server.getWorld(getWorld()),getX(), getY() + 1, getZ(), getPitch(), getYaw());
     }
-
-    public int getId() {
-        return id;
+    
+    public boolean delete(TweakWarp plugin) {
+    	if(plugin.forgetWarp(this)) {
+    		plugin.getDatabase().delete(this);
+    		return true;
+    	}
+    	return false;
     }
-
-    public void setId(int id) {
-        this.id = id;
+    
+    public boolean save(TweakWarp plugin) {
+    	Warp w = plugin.getWarp(getWarpgroup(), getName());
+    	if(w != null) w.delete(plugin);
+    	plugin.getDatabase().save(this);
+    	if(plugin.registerWarp(this)) {
+    		plugin.getDatabase().save(this);
+    		return true;
+    	}
+    	return false;
     }
+    
+	public int getId() {
+		return id;
+	}
 
-    public String getName() {
-        return Name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        Name = name;
-    }
+	public double getX() {
+		return x;
+	}
 
-    public String getWorld() {
-        return World;
-    }
+	public double getY() {
+		return y;
+	}
 
-    public void setWorld(String world) {
-        World = world;
-    }
+	public double getZ() {
+		return z;
+	}
 
-    public double getX() {
-        return X;
-    }
+	public float getPitch() {
+		return pitch;
+	}
 
-    public void setX(double x) {
-        X = x;
-    }
+	public float getYaw() {
+		return yaw;
+	}
 
-    public double getY() {
-        return Y;
-    }
+	public String getWorld() {
+		return world;
+	}
 
-    public void setY(double y) {
-        Y = y;
-    }
+	public String getWarpgroup() {
+		return warpgroup;
+	}
 
-    public double getZ() {
-        return Z;
-    }
+	public String getAccessgroup() {
+		return accessgroup;
+	}
 
-    public void setZ(double z) {
-        Z = z;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public float getPitch() {
-        return Pitch;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setPitch(float pitch) {
-        Pitch = pitch;
-    }
+	public void setX(double x) {
+		this.x = x;
+	}
 
-    public float getYaw() {
-        return Yaw;
-    }
+	public void setY(double y) {
+		this.y = y;
+	}
 
-    public void setYaw(float yaw) {
-        Yaw = yaw;
-    }
+	public void setZ(double z) {
+		this.z = z;
+	}
 
-    /* public Warp(double x, double y, double z, float pitch, float yaw, String name, String world) {
-        X = x;
-        Y = y;
-        Z = z;
-        Pitch = pitch;
-        Yaw = yaw;
-        World = world;
-        Name = name;
-    }
+	public void setPitch(float pitch) {
+		this.pitch = pitch;
+	}
 
-    public Warp(double x, double y, double z, float pitch, float yaw, String name, String world, String group) {
-        X = x;
-        Y = y;
-        Z = z;
-        Pitch = pitch;
-        Yaw = yaw;
-        World = world;
-        Name = name;
-        Group = group;
-    }
+	public void setYaw(float yaw) {
+		this.yaw = yaw;
+	}
 
-    public Warp() {
-        
-    } */
+	public void setWorld(String world) {
+		this.world = world;
+	}
 
-    public void construct(double x, double y, double z, float pitch, float yaw, String name, String world) {
-        X = x;
-        Y = y;
-        Z = z;
-        Pitch = pitch;
-        Yaw = yaw;
-        World = world;
-        Name = name;
-    }
+	public void setWarpgroup(String warpgroup) {
+		this.warpgroup = warpgroup;
+	}
 
-    public void construct(double x, double y, double z, float pitch, float yaw, String name, String world, String group) {
-        X = x;
-        Y = y;
-        Z = z;
-        Pitch = pitch;
-        Yaw = yaw;
-        World = world;
-        Name = name;
-    }
+	public void setAccessgroup(String accessgroup) {
+		this.accessgroup = accessgroup;
+	}
 }
