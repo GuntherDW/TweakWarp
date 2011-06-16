@@ -39,7 +39,7 @@ public class WarpGroup {
 			TweakWarp.log.warning("[TweakWarp] trying to add warp to invalid group, warp: " + warp.getName() + "[" + warp.getWarpgroup() + "] to group " + getName() + ".");
 			return false;
 		}
-		warps.put(warp.getName(), warp);
+		warps.put(warp.getName().toLowerCase(), warp);
 		return true;
 	}
 	
@@ -48,7 +48,7 @@ public class WarpGroup {
 			TweakWarp.log.warning("[TweakWarp] trying to remove warp from invalid group, warp: " + warp.getName() + "[" + warp.getWarpgroup() + "] from group " + getName() + ".");
 			return false;
 		}
-		warps.remove(warp.getName());
+		warps.remove(warp.getName().toLowerCase());
 		return true;
 	}
 	
