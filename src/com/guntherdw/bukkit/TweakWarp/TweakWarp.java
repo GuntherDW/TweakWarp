@@ -29,7 +29,7 @@ public class TweakWarp extends JavaPlugin {
 
     protected final static Logger log = Logger.getLogger("Minecraft");
     public static final String DEFAULT_WARP_GROUP = "default";
-    public static final String DEFAULT_ACCESS_GROUP = null;
+    public static final String DEFAULT_ACCESS_GROUP = "";
 
     public static Permissions perm = null;
     public Map<String, WarpGroup> warps = new HashMap<String, WarpGroup>();
@@ -254,12 +254,12 @@ public class TweakWarp extends JavaPlugin {
             // this.reloadWarpTable(); SERIOUSLY ?
             return true;
         } else if(cmd.equals("warp")) {
-            if(commandSender instanceof Player) {
+            if(!(commandSender instanceof Player)) {
             	commandSender.sendMessage("You need to be a player to warp!");
             	return true;
             }
             Player player = (Player) commandSender;
-            if(check(player, "tweakwarp.warp")) {
+            if(!check(player, "tweakwarp.warp")) {
             	player.sendMessage("You don't have permission to warp!");
             	return true;
             }
