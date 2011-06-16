@@ -19,7 +19,7 @@ public class WarpGroup {
 		if(rt == null) {
 			int delta = Integer.MAX_VALUE;
 			for(Warp w : warps.values()) {
-				if(w.getName().contains(warpname) && Math.abs(w.getName().length() - warpname.length()) < delta) {
+				if(w.getName().toLowerCase().contains(warpname) && Math.abs(w.getName().length() - warpname.length()) < delta) {
 					rt = w;
 					delta = Math.abs(w.getName().length() - warpname.length());
 					if(delta == 0) break;

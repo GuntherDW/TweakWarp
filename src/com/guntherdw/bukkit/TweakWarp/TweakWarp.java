@@ -220,7 +220,7 @@ public class TweakWarp extends JavaPlugin {
             // this.reloadWarpTable(); SERIOUSLY ?
             return true;
         } else if(cmd.equals("setwarp")) {
-            if(commandSender instanceof Player) {
+            if(!(commandSender instanceof Player)) {
             	commandSender.sendMessage("You need to be a player to set a warp!");
             	return true;
             }
