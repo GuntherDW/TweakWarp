@@ -236,7 +236,7 @@ public class TweakWarp extends JavaPlugin {
             	return true;
             }
                 
-            String warpname = strings[0].toLowerCase();
+            String warpname = strings[0];
             
             String warpgroup = DEFAULT_WARP_GROUP;
             if(strings.length > 1) warpgroup = strings[1].toLowerCase();
