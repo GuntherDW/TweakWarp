@@ -226,7 +226,7 @@ public class TweakWarp extends JavaPlugin {
             }
             
             Player player = (Player) commandSender;
-            if(check(player, "tweakwarp.setwarp")){
+            if(!check(player, "tweakwarp.setwarp")){
             	player.sendMessage("You do not have the correct permissions");
             	return true;
             }

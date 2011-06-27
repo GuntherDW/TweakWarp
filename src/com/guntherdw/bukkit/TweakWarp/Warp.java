@@ -65,7 +65,7 @@ public class Warp {
         this.z = z;
         this.pitch = pitch;
         this.yaw = yaw;
-        this.name = name.toLowerCase();
+        this.name = name;
         this.world = world;
         this.warpgroup = warpgroup.toLowerCase();
         if(this.warpgroup.trim().equals("")) this.warpgroup = TweakWarp.DEFAULT_WARP_GROUP;
@@ -82,7 +82,7 @@ public class Warp {
     
     public boolean delete(TweakWarp plugin) {
     	if(plugin.forgetWarp(this)) {
-    		plugin.getDatabase().delete(this);
+    		plugin.getDatabase().delete(Warp.class, this.id);
     		return true;
     	}
     	return false;
@@ -91,7 +91,6 @@ public class Warp {
     public boolean save(TweakWarp plugin) {
     	Warp w = plugin.getWarp(getWarpgroup(), getName());
     	if(w != null) w.delete(plugin);
-    	plugin.getDatabase().save(this);
     	if(plugin.registerWarp(this)) {
     		plugin.getDatabase().save(this);
     		return true;
