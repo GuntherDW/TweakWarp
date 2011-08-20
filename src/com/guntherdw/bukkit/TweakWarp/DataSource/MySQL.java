@@ -90,7 +90,7 @@ public class MySQL {
 
             }
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return warps;
     }
@@ -119,7 +119,7 @@ public class MySQL {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return temp;
     }
@@ -150,7 +150,7 @@ public class MySQL {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return temp;
     }
@@ -184,7 +184,7 @@ public class MySQL {
                 return rs.getInt(0);
 
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         return -1;
     }
@@ -200,7 +200,7 @@ public class MySQL {
             return;
 
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
     
@@ -217,7 +217,7 @@ public class MySQL {
             return;
 
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 
