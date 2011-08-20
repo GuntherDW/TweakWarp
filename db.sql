@@ -4,9 +4,10 @@ CREATE TABLE IF NOT EXISTS `warps` (
   `x` double NOT NULL,
   `y` double NOT NULL,
   `z` double NOT NULL,
-  `rotX` float NOT NULL,
-  `rotY` float NOT NULL,
+  `pitch` float NOT NULL,
+  `yaw` float NOT NULL,
   `world` varchar(25) NOT NULL DEFAULT 'world',
-  `group` varchar(64) NOT NULL DEFAULT '',
+  `warpgroup` varchar(64) NOT NULL DEFAULT '',
+  `accessgroup` varchar(64) NOT NULL DEFAULT ''
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
