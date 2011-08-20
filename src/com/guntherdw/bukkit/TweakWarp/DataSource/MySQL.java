@@ -103,6 +103,7 @@ public class MySQL {
         try {
             int count = 0;
             st = conn.prepareStatement("SELECT id,name,x,y,z,pitch,yaw,world,warpgroup,accessgroup FROM `warps` WHERE `id` = ?");
+            st.setInt(1, id);
             rs = st.executeQuery();
             if(rs.next()) {
                 temp = new Warp(rs.getDouble("x"),
@@ -132,8 +133,8 @@ public class MySQL {
         try {
             int count = 0;
             st = conn.prepareStatement("SELECT id,name,x,y,z,pitch,yaw,world,warpgroup,accessgroup FROM `warps` WHERE `name` = ? AND `warpgroup` = ?");
-            st.setString(0, name);
-            st.setString(1, warpgroup);
+            st.setString(1, name);
+            st.setString(2, warpgroup);
             rs = st.executeQuery();
             if(rs.next()) {
                 temp = new Warp(rs.getDouble("x"),
@@ -168,15 +169,15 @@ public class MySQL {
             this.deleteWarp(warp.getName(), warp.getWarpgroup());
 
             st = conn.prepareStatement("INSERT INTO `warps` (name,x,y,z,pitch,yaw,world,warpgroup,accessgroup) VALUES (?,?,?,?,?,?,?,?,?)");
-            st.setString(0, warp.getName());
-            st.setDouble(1, warp.getX());
-            st.setDouble(2, warp.getY());
-            st.setDouble(3, warp.getZ());
-            st.setFloat (4, warp.getPitch());
-            st.setFloat (5, warp.getYaw());
-            st.setString(6, warp.getWorld());
-            st.setString(7, warp.getWarpgroup());
-            st.setString(8, warp.getAccessgroup());
+            st.setString(1, warp.getName());
+            st.setDouble(2, warp.getX());
+            st.setDouble(3, warp.getY());
+            st.setDouble(4, warp.getZ());
+            st.setFloat (5, warp.getPitch());
+            st.setFloat (6, warp.getYaw());
+            st.setString(7, warp.getWorld());
+            st.setString(8, warp.getWarpgroup());
+            st.setString(9, warp.getAccessgroup());
 
             // st.executeQuery();
             rs = st.getGeneratedKeys();
@@ -195,7 +196,7 @@ public class MySQL {
         ResultSet rs = null;
         try{
             st = conn.prepareStatement("DELETE FROM `warps` WHERE `id` = ?");
-            st.setInt(0, id);
+            st.setInt(1, id);
             st.executeQuery();
             return;
 
@@ -211,8 +212,8 @@ public class MySQL {
         ResultSet rs = null;
         try{
             st = conn.prepareStatement("DELETE FROM `warps` WHERE `name` = ? AND `warpgroup` = ?");
-            st.setString(0, warpname);
-            st.setString(1, warpgroup);
+            st.setString(1, warpname);
+            st.setString(2, warpgroup);
             st.executeQuery();
             return;
 
