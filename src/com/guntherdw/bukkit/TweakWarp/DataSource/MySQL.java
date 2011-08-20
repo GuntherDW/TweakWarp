@@ -168,7 +168,7 @@ public class MySQL {
             // Delete any warp that was there beforehand
             this.deleteWarp(warp.getName(), warp.getWarpgroup());
 
-            st = conn.prepareStatement("INSERT INTO `warps` (name,x,y,z,pitch,yaw,world,warpgroup,accessgroup) VALUES (?,?,?,?,?,?,?,?,?)");
+            st = conn.prepareStatement("INSERT INTO `warps` (name,x,y,z,pitch,yaw,world,warpgroup,accessgroup) VALUES (?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             st.setString(1, warp.getName());
             st.setDouble(2, warp.getX());
             st.setDouble(3, warp.getY());
@@ -181,7 +181,7 @@ public class MySQL {
 
             // st.executeQuery();
             rs = st.getGeneratedKeys();
-            if(rs!=null)
+            if(rs.next())
                 return rs.getInt(0);
 
         } catch (SQLException e) {
@@ -197,7 +197,7 @@ public class MySQL {
         try{
             st = conn.prepareStatement("DELETE FROM `warps` WHERE `id` = ?");
             st.setInt(1, id);
-            st.executeQuery();
+            st.executeUpdate();
             return;
 
         } catch (SQLException e) {
@@ -214,7 +214,7 @@ public class MySQL {
             st = conn.prepareStatement("DELETE FROM `warps` WHERE `name` = ? AND `warpgroup` = ?");
             st.setString(1, warpname);
             st.setString(2, warpgroup);
-            st.executeQuery();
+            st.executeUpdate();
             return;
 
         } catch (SQLException e) {

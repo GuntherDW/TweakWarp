@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.persistence.PersistenceException;
-
 import com.guntherdw.bukkit.TweakWarp.DataSource.MySQL;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -239,7 +237,7 @@ public class TweakWarp extends JavaPlugin {
             
             String accessgroup = DEFAULT_ACCESS_GROUP;
             if(strings.length > 2) accessgroup = strings[2].toLowerCase();
-            
+
             Warp tempwarp = new Warp(player.getLocation(), warpname, warpgroup, accessgroup);
             if(tempwarp.save(this)) {
                 log.info("[TweakWarp] Warp '"+warpname+"' created by "+player.getName()+"!");

@@ -77,7 +77,7 @@ public class Warp {
     }
 
     public Location getLocation(Server server) {
-    	return new Location(server.getWorld(getWorld()),getX(), getY() + 1, getZ(), getPitch(), getYaw());
+    	return new Location(server.getWorld(getWorld()),getX(), getY() + 1, getZ(), getYaw(), getPitch());
     }
     
     public boolean delete(TweakWarp plugin) {
