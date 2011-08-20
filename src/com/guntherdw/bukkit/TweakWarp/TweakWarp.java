@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import javax.persistence.PersistenceException;
 
+import com.guntherdw.bukkit.TweakWarp.DataSource.MySQL;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -36,6 +37,8 @@ public class TweakWarp extends JavaPlugin {
 
     public List<String> saveWarps = new ArrayList<String>();;
     public TweakcraftUtils tweakcraftutils = null;
+    
+    private MySQL ds;
 
     public boolean registerWarp(Warp warp) {
     	WarpGroup group = getWarpGroup(warp.getWarpgroup());
@@ -102,39 +105,28 @@ public class TweakWarp extends JavaPlugin {
     }
 
     public void loadAllWarps() {
-        List<Warp> warpies =  this.getDatabase().find(Warp.class).findList();
+        List<Warp> warpies = ds.getAllWarps();
         warps.clear();
         for(Warp w : warpies) {
             registerWarp(w);
         }
+    }
+    
+    public MySQL getDataSource() {
+        return ds;
     }
 
     public void onDisable() {
         log.info("[TweakWarp] Shutting down!");
     }
 
-    private void setupDatabase() {
-        try {
-            getDatabase().find(Warp.class).findRowCount();
-        } catch (PersistenceException ex) {
-            log.info("Installing database for " + getDescription().getName() + " due to first time usage");
-            installDDL();
-        }
-    }
-
-    @Override
-    public List<Class<?>> getDatabaseClasses() {
-        List<Class<?>> list = new ArrayList<Class<?>>();
-        list.add(Warp.class);
-        return list;
-    }
-
     public void onEnable() {
         setupPermissions();
         setupTCUtils();
 
+        this.ds = new MySQL(this);
         saveWarps.clear();
-        setupDatabase();
+        // setupDatabase();
         loadAllWarps();
         PluginDescriptionFile pdfFile = this.getDescription();
         log.info("[TweakWarp] TweakWarp v"+pdfFile.getVersion()+" enabled!");
@@ -167,6 +159,10 @@ public class TweakWarp extends JavaPlugin {
             return player.isOp() ||
                     perm.getHandler().permission(player, permNode);
         }
+    }
+    
+    public Logger getLogger() {
+        return log;
     }
     
     public boolean inGroup(Player player, String group) {

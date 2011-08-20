@@ -53,7 +53,7 @@ public class Warp {
     private String accessgroup;
 
     /**
-     *  Default contructor for persistence manager.
+     *  Default constructor for persistence manager.
      */
 	public Warp() {
 		
@@ -82,7 +82,8 @@ public class Warp {
     
     public boolean delete(TweakWarp plugin) {
     	if(plugin.forgetWarp(this)) {
-    		plugin.getDatabase().delete(Warp.class, this.id);
+    		// plugin.getDatabase().delete(Warp.class, this.id);
+            plugin.getDataSource().deleteWarp(name, accessgroup);
     		return true;
     	}
     	return false;
@@ -92,7 +93,9 @@ public class Warp {
     	Warp w = plugin.getWarp(getWarpgroup(), getName());
     	if(w != null) w.delete(plugin);
     	if(plugin.registerWarp(this)) {
-    		plugin.getDatabase().save(this);
+    		// plugin.getDatabase().save(this);
+            int id = plugin.getDataSource().addWarp(this);
+            if(id!=-1) this.id = id;
     		return true;
     	}
     	return false;

@@ -1,7 +1,6 @@
 name: TweakWarp
 main: com.guntherdw.bukkit.TweakWarp.TweakWarp
-version: 3.0
-database: true
+version: 3.5
 authors:
  - GuntherDW
  - Meaglin
