@@ -191,9 +191,12 @@ public class TweakWarp extends JavaPlugin {
             String sendername = "CONSOLE";
             if(commandSender instanceof Player && !(check((Player)commandSender, "tweakwarp.removewarp"))) {
                 commandSender.sendMessage(ChatColor.RED+"You do not have the correct permission!");
-                sendername = ((Player) commandSender).getName();
                 return true;
             }
+            if(commandSender instanceof Player) {
+                sendername = ((Player) commandSender).getName();
+            }
+
             if(strings.length < 1) {
             	commandSender.sendMessage(ChatColor.AQUA + command.getUsage());
             	return true;
