@@ -188,14 +188,17 @@ public class TweakWarp extends JavaPlugin {
         	}
             return true;
         } else if(cmd.equals("removewarp")) {
+            String sendername = "CONSOLE";
             if(commandSender instanceof Player && !(check((Player)commandSender, "tweakwarp.removewarp"))) {
                 commandSender.sendMessage(ChatColor.RED+"You do not have the correct permission!");
+                sendername = ((Player) commandSender).getName();
                 return true;
             }
             if(strings.length < 1) {
             	commandSender.sendMessage(ChatColor.AQUA + command.getUsage());
             	return true;
             }
+            
 
             String warpname = strings[0].toLowerCase();
             String warpgroup = DEFAULT_WARP_GROUP;
@@ -207,6 +210,7 @@ public class TweakWarp extends JavaPlugin {
             }
             
             if(warp.delete(this)) {
+                log.info("[TweakWarp] Warp '"+warpname+"' removed by "+sendername+"!");
                 commandSender.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' removed!");
             } else {
                 commandSender.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");

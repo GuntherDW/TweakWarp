@@ -180,6 +180,7 @@ public class MySQL {
             st.setString(9, warp.getAccessgroup());
 
             // st.executeQuery();
+            st.executeUpdate();
             rs = st.getGeneratedKeys();
             if(rs.next())
                 return rs.getInt(0);
