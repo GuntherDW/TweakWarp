@@ -56,6 +56,10 @@ public class WarpGroup {
 		return warps.values();
 	}
 	
+	public int getWarpCount(){
+		return warps.values().size();
+	}
+	
 	public String getName() {
 		return name;
 	}
