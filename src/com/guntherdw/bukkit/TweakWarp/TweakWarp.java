@@ -3,11 +3,11 @@ package com.guntherdw.bukkit.TweakWarp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.guntherdw.bukkit.TweakWarp.DataSource.MySQL;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -17,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.guntherdw.bukkit.TweakWarp.DataSource.MySQL;
 import com.guntherdw.bukkit.tweakcraft.TweakcraftUtils;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
@@ -60,9 +61,21 @@ public class TweakWarp extends JavaPlugin {
     	return group == null ? null : group.getWarp(warpname);
     }
     
+    
     public Warp matchWarp(String warpgroup, String warpname) {
     	WarpGroup group = matchWarpGroup(warpgroup);
     	return group == null ? null : group.matchWarp(warpname);
+    }
+    
+    public List<Warp> matchWarp(String warpname){
+    	List<Warp> warpList = new ArrayList<Warp>();
+    	for(WarpGroup w: warps.values()){
+    		Warp warp = w.getWarp(warpname);
+    		if(warp != null){
+    			warpList.add(warp);
+    		}
+    	}
+    	return warpList;
     }
     
     public WarpGroup getWarpGroup(String warpgroup) {
@@ -185,6 +198,13 @@ public class TweakWarp extends JavaPlugin {
         	} else {
         		commandSender.sendMessage(ChatColor.GREEN + "Current warps:");
         		commandSender.sendMessage(getWarps(DEFAULT_WARP_GROUP));
+        		commandSender.sendMessage(ChatColor.GREEN + "Current warpgroups:");
+        		String message = "";
+        		for(WarpGroup wg: warps.values()){
+        			message += ChatColor.AQUA + wg.getName();
+        			message += ChatColor.GOLD + "(" + wg.getWarpCount() + ")";
+        		}
+        		commandSender.sendMessage(message);
         	}
             return true;
         } else if(cmd.equals("removewarp")) {
@@ -269,9 +289,26 @@ public class TweakWarp extends JavaPlugin {
             	return true;
             }
             String warpname = strings[0].toLowerCase();
-            String warpgroup = DEFAULT_WARP_GROUP;
-            if(strings.length > 1) warpgroup = strings[1].toLowerCase();
-            Warp warp = matchWarp(warpgroup, warpname);
+            Warp warp;
+            if(strings.length > 1){
+            	String warpgroup = strings[1].toLowerCase();
+            	warp = matchWarp(warpgroup, warpname);
+            }
+            else{
+            	List<Warp> warpList = matchWarp(warpname);
+            	if(warpList.size()>1){
+            		String msg = ChatColor.AQUA + "Multiple warps found " + ChatColor.WHITE;
+            		for(Iterator<Warp> it = warpList.iterator(); it.hasNext();){
+            			Warp temp = it.next();
+            			msg += temp.getName() + "(" + temp.getWarpgroup() + "), ";
+            		}
+            		player.sendMessage(msg);
+            		return true;
+            	}
+            	else{
+            		warp = warpList.get(0);
+            	}
+            }
             
             if(warp == null) {
             	log.info("[TweakWarp] "+player.getName()+" tried to warp to '"+warpname+"'!");
@@ -329,6 +366,40 @@ public class TweakWarp extends JavaPlugin {
                 saveWarps.remove(p.getName());
             }
             return true;
+        } else if(cmd.equals("regroupwarp")){
+        	if(commandSender instanceof Player){
+        		Player p = (Player) commandSender;
+        		if(check(p,"tweakcraftutils.regroupwarp")){
+        			if(strings.length == 2){
+        				String warpname = strings[0];
+        				String newGroup = strings[1];
+        				List<Warp> warpList = matchWarp(warpname);
+        				if(warps.size() == 1){
+        					Warp w = warpList.get(0);
+        					String oldGroup = w.getWarpgroup();
+        					WarpGroup wOld = warps.get(oldGroup);
+        					WarpGroup wNew = warps.get(newGroup);
+        					if(wOld != null && wNew != null){
+        						wOld.forgetWarp(w);
+        						wNew.registerWarp(w);
+        					}
+        					else{
+        						commandSender.sendMessage(ChatColor.RED + "Something went wrong, aborting action");
+        					}
+        				}
+        				else{
+        					commandSender.sendMessage(ChatColor.RED + "Multiple warps found that fit your query");
+        				}
+        			}
+        			else{
+        				commandSender.sendMessage(command.getUsage());
+        			}
+        		}
+        	}
+        	else{
+        		commandSender.sendMessage("Hello console, please come ingame to do this");
+        	}
+
         }
         return false;
     }

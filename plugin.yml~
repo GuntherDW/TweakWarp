@@ -28,7 +28,3 @@ commands:
         description: Toggle warp saving for tpback
         usage: /<command>
         _permission: tweakcraftutils.tpback
-     regroupwarp:
-        description: Moves warp from group to group
-        usage: /<command> [name] [new warpgroup]
-	_permission: tweakcraftutils.regroupwarp
