@@ -3,13 +3,12 @@ package com.guntherdw.bukkit.TweakWarp;
 import com.avaje.ebean.validation.Length;
 import com.avaje.ebean.validation.NotEmpty;
 import com.avaje.ebean.validation.NotNull;
+import org.bukkit.Location;
+import org.bukkit.Server;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.bukkit.Location;
-import org.bukkit.Server;
 
 /**
  * @author GuntherDW
@@ -17,7 +16,7 @@ import org.bukkit.Server;
 @Entity()
 @Table(name="warps")
 public class Warp {
-    
+
     @Id
     private int id;
 
@@ -47,7 +46,7 @@ public class Warp {
     @Length(max=100)
     @NotNull
     private String warpgroup;
-    
+
     @Length(max=100)
     @NotNull
     private String accessgroup;
@@ -55,10 +54,10 @@ public class Warp {
     /**
      *  Default constructor for persistence manager.
      */
-	public Warp() {
-		
-	}
-	
+    public Warp() {
+
+    }
+
     public Warp(double x, double y, double z, float pitch, float yaw, String name, String world, String warpgroup, String accessgroup) {
         this.x = x;
         this.y = y;
@@ -71,113 +70,113 @@ public class Warp {
         if(this.warpgroup.trim().equals("")) this.warpgroup = TweakWarp.DEFAULT_WARP_GROUP;
         this.accessgroup = accessgroup.toLowerCase();
     }
-    
+
     public Warp(Location location, String name, String warpgroup, String accessgroup) {
-    	this(location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw(), name, location.getWorld().getName(), warpgroup, accessgroup);
+        this(location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw(), name, location.getWorld().getName(), warpgroup, accessgroup);
     }
 
     public Location getLocation(Server server) {
-    	return new Location(server.getWorld(getWorld()),getX(), getY() + 1, getZ(), getYaw(), getPitch());
+        return new Location(server.getWorld(getWorld()),getX(), getY() + 1, getZ(), getYaw(), getPitch());
     }
-    
+
     public boolean delete(TweakWarp plugin) {
-    	if(plugin.forgetWarp(this)) {
-    		// plugin.getDatabase().delete(Warp.class, this.id);
+        if(plugin.forgetWarp(this)) {
+            // plugin.getDatabase().delete(Warp.class, this.id);
             plugin.getDataSource().deleteWarp(name, accessgroup);
-    		return true;
-    	}
-    	return false;
+            return true;
+        }
+        return false;
     }
-    
+
     public boolean save(TweakWarp plugin) {
-    	Warp w = plugin.getWarp(getWarpgroup(), getName());
-    	if(w != null) w.delete(plugin);
-    	if(plugin.registerWarp(this)) {
-    		// plugin.getDatabase().save(this);
+        Warp w = plugin.getWarp(getWarpgroup(), getName());
+        if(w != null) w.delete(plugin);
+        if(plugin.registerWarp(this)) {
+            // plugin.getDatabase().save(this);
             int id = plugin.getDataSource().addWarp(this);
             if(id!=-1) this.id = id;
-    		return true;
-    	}
-    	return false;
+            return true;
+        }
+        return false;
     }
-    
-	public int getId() {
-		return id;
-	}
 
-	public String getName() {
-		return name;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public double getX() {
-		return x;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public double getY() {
-		return y;
-	}
+    public double getX() {
+        return x;
+    }
 
-	public double getZ() {
-		return z;
-	}
+    public double getY() {
+        return y;
+    }
 
-	public float getPitch() {
-		return pitch;
-	}
+    public double getZ() {
+        return z;
+    }
 
-	public float getYaw() {
-		return yaw;
-	}
+    public float getPitch() {
+        return pitch;
+    }
 
-	public String getWorld() {
-		return world;
-	}
+    public float getYaw() {
+        return yaw;
+    }
 
-	public String getWarpgroup() {
-		return warpgroup;
-	}
+    public String getWorld() {
+        return world;
+    }
 
-	public String getAccessgroup() {
-		return accessgroup;
-	}
+    public String getWarpgroup() {
+        return warpgroup;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public String getAccessgroup() {
+        return accessgroup;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setX(double x) {
-		this.x = x;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setY(double y) {
-		this.y = y;
-	}
+    public void setX(double x) {
+        this.x = x;
+    }
 
-	public void setZ(double z) {
-		this.z = z;
-	}
+    public void setY(double y) {
+        this.y = y;
+    }
 
-	public void setPitch(float pitch) {
-		this.pitch = pitch;
-	}
+    public void setZ(double z) {
+        this.z = z;
+    }
 
-	public void setYaw(float yaw) {
-		this.yaw = yaw;
-	}
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
 
-	public void setWorld(String world) {
-		this.world = world;
-	}
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
 
-	public void setWarpgroup(String warpgroup) {
-		this.warpgroup = warpgroup;
-	}
+    public void setWorld(String world) {
+        this.world = world;
+    }
 
-	public void setAccessgroup(String accessgroup) {
-		this.accessgroup = accessgroup;
-	}
+    public void setWarpgroup(String warpgroup) {
+        this.warpgroup = warpgroup;
+    }
+
+    public void setAccessgroup(String accessgroup) {
+        this.accessgroup = accessgroup;
+    }
 }

@@ -183,7 +183,7 @@ public class MySQL {
             st.executeUpdate();
             rs = st.getGeneratedKeys();
             if(rs.next())
-                return rs.getInt(0);
+                return rs.getInt(1);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -205,7 +205,7 @@ public class MySQL {
             e.printStackTrace();
         }
     }
-    
+
     public void deleteWarp(String warpname, String warpgroup) {
         if(warpname==null||warpname.trim().equals("")) return;
         Connection conn = getConnection();
