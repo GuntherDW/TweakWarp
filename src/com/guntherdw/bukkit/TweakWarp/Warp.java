@@ -99,6 +99,19 @@ public class Warp {
         }
         return false;
     }
+    
+    public boolean updateGroup(TweakWarp plugin, String newGroup) {
+        Warp w = plugin.getWarp(getWarpgroup(), getName());
+        if(w==null) return false;
+        plugin.forgetWarp(this);
+        this.setWarpgroup(newGroup);
+        if(plugin.registerWarp(this)) {
+            int amt = plugin.getDataSource().updateGroup(this.id, newGroup);
+            if(amt == 0) return false;
+            return true;
+        }
+        return false;
+    }
 
     public int getId() {
         return id;

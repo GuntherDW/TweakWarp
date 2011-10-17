@@ -39,7 +39,6 @@ public class MySQL {
             Class.forName(driverName);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            //return null;
         }
     }
 
@@ -91,6 +90,12 @@ public class MySQL {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try{
+                if(conn!=null) conn.close();
+                if(st!=null) st.close();
+                if(rs!=null) rs.close();
+            } catch(Exception ex) { ; }
         }
         return warps;
     }
@@ -101,7 +106,6 @@ public class MySQL {
         ResultSet rs = null;
         Warp temp = null;
         try {
-            int count = 0;
             st = conn.prepareStatement("SELECT id,name,x,y,z,pitch,yaw,world,warpgroup,accessgroup FROM `warps` WHERE `id` = ?");
             st.setInt(1, id);
             rs = st.executeQuery();
@@ -121,6 +125,12 @@ public class MySQL {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try{
+                if(conn!=null) conn.close();
+                if(st!=null) st.close();
+                if(rs!=null) rs.close();
+            } catch(Exception ex) { ; }
         }
         return temp;
     }
@@ -131,7 +141,6 @@ public class MySQL {
         ResultSet rs = null;
         Warp temp = null;
         try {
-            int count = 0;
             st = conn.prepareStatement("SELECT id,name,x,y,z,pitch,yaw,world,warpgroup,accessgroup FROM `warps` WHERE `name` = ? AND `warpgroup` = ?");
             st.setString(1, name);
             st.setString(2, warpgroup);
@@ -152,6 +161,12 @@ public class MySQL {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try{
+                if(conn!=null) conn.close();
+                if(st!=null) st.close();
+                if(rs!=null) rs.close();
+            } catch(Exception ex) { ; }
         }
         return temp;
     }
@@ -163,7 +178,6 @@ public class MySQL {
         Connection conn = getConnection();
         PreparedStatement st = null;
         ResultSet rs = null;
-        Warp temp = null;
         try {
             // Delete any warp that was there beforehand
             this.deleteWarp(warp.getName(), warp.getWarpgroup());
@@ -187,6 +201,12 @@ public class MySQL {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try{
+                if(conn!=null) conn.close();
+                if(st!=null) st.close();
+                if(rs!=null) rs.close();
+            } catch(Exception ex) { ; }
         }
         return -1;
     }
@@ -194,7 +214,6 @@ public class MySQL {
     public void deleteWarp(int id) {
         Connection conn = getConnection();
         PreparedStatement st = null;
-        ResultSet rs = null;
         try{
             st = conn.prepareStatement("DELETE FROM `warps` WHERE `id` = ?");
             st.setInt(1, id);
@@ -203,14 +222,38 @@ public class MySQL {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try{
+                if(conn!=null) conn.close();
+                if(st!=null) st.close();
+                // if(rs!=null) rs.close();
+            } catch(Exception ex) { ; }
         }
+    }
+
+    public int updateGroup(int id, String newGrp) {
+        Connection conn = getConnection();
+        PreparedStatement st = null;
+        try{
+            st = conn.prepareStatement("UPDATE `warps` SET `warpgroup` = ? WHERE `id` = ?");
+            st.setString(1, newGrp);
+            st.setInt   (2, id);
+            return st.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if(conn!=null) conn.close();
+                if(st!=null) st.close();
+            } catch(Exception ex) { ; }
+        }
+        return 0;
     }
 
     public void deleteWarp(String warpname, String warpgroup) {
         if(warpname==null||warpname.trim().equals("")) return;
         Connection conn = getConnection();
         PreparedStatement st = null;
-        ResultSet rs = null;
         try{
             st = conn.prepareStatement("DELETE FROM `warps` WHERE `name` = ? AND `warpgroup` = ?");
             st.setString(1, warpname);
@@ -220,6 +263,11 @@ public class MySQL {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try{
+                if(conn!=null) conn.close();
+                if(st!=null) st.close();
+            } catch(Exception ex) { ; }
         }
     }
 

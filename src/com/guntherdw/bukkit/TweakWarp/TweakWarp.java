@@ -79,15 +79,19 @@ public class TweakWarp extends JavaPlugin {
         return rt;
     }
 
-    public List<Warp> matchWarp(String warpname){
+    public List<Warp> matchWarp(String warpname, boolean strict) {
         List<Warp> warpList = new ArrayList<Warp>();
         for(WarpGroup w: warps.values()){
-            Warp warp = w.matchWarp(warpname);
+            Warp warp = strict?w.getWarp(warpname):w.matchWarp(warpname);
             if(warp != null){
                 warpList.add(warp);
             }
         }
         return warpList;
+    }
+
+    public List<Warp> matchWarp(String warpname) {
+        return this.matchWarp(warpname, false);
     }
 
     public String getWarps(String warpgroup) {
@@ -360,38 +364,45 @@ public class TweakWarp extends JavaPlugin {
             }
             return true;
         } else if(cmd.equals("regroupwarp")){
-            if(commandSender instanceof Player){
-                Player p = (Player) commandSender;
-                if(check(p,"tweakwarp.regroupwarp")){
-                    if(strings.length == 2){
-                        String warpname = strings[0];
-                        String newGroup = strings[1];
-                        List<Warp> warpList = matchWarp(warpname);
-                        if(warpList.size() == 1){
-                            Warp w = warpList.get(0);
-                            String oldGroup = w.getWarpgroup();
-                            WarpGroup wOld = warps.get(oldGroup);
-                            WarpGroup wNew = warps.get(newGroup);
-                            if(wOld != null && wNew != null){
-                                wOld.forgetWarp(w);
-                                wNew.registerWarp(w);
-                            }
-                            else{
-                                commandSender.sendMessage(ChatColor.RED + "Something went wrong, aborting action");
-                            }
-                        }
-                        else{
-                            commandSender.sendMessage(ChatColor.RED + "Multiple warps found that fit your query");
-                        }
-                    }
-                    else{
-                        commandSender.sendMessage(command.getUsage());
-                    }
+            if(commandSender instanceof Player)
+                if(this.check((Player)commandSender, "tweakwarp.regroupwarp")) {
+                    commandSender.sendMessage(ChatColor.RED+"You don't have permission for this!");
+                    return true;
                 }
+            
+            if(strings.length!=2) {
+                commandSender.sendMessage(ChatColor.YELLOW+"Incorrect usage!");
+                commandSender.sendMessage(command.getUsage());
+                return true;
             }
-            else{
-                commandSender.sendMessage("Hello console, please come ingame to do this");
+            
+            String warpname = strings[0];
+            String warpgrp  = strings[1];
+            
+            List<Warp> warplist = matchWarp(warpname, true);
+            if(warplist.size()==0) {
+                commandSender.sendMessage(ChatColor.YELLOW+"No warp by that name found!");
+                return true;
+            } else if(warplist.size()!=1) {
+                commandSender.sendMessage(ChatColor.YELLOW+"Multiple warps found!");
+                for(Warp w : warplist)
+                    commandSender.sendMessage(ChatColor.GOLD+w.getWarpgroup() + ChatColor.AQUA+"->"+ChatColor.GREEN+w.getName());
+                return true;
             }
+            
+            Warp warp = warplist.get(0);
+            String oldGroup = warp.getWarpgroup();
+            WarpGroup wgold = warps.get(oldGroup);
+            WarpGroup wgnew = warps.get(warpgrp);
+            if(wgold!=null && wgnew != null) {
+                if(warp.updateGroup(this, warpgrp))
+                    commandSender.sendMessage(ChatColor.GREEN+"This warp has been moved to "+ChatColor.GOLD + wgnew.getName()+ChatColor.GREEN+"!");
+                else
+                    commandSender.sendMessage(ChatColor.RED+"Something went wrong, alert a serveradmin!");
+            } else {
+                commandSender.sendMessage(ChatColor.RED+"Couldn't find one of the groups!");
+            }
+            return true;
 
         }
         return false;

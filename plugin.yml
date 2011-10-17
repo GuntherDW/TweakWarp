@@ -31,4 +31,5 @@ commands:
      regroupwarp:
         description: Moves warp from group to group
         usage: /<command> [name] [new warpgroup]
+        aliases: [ 'movewarp', 'mvwarp', 'mvw' ]
         _permission: tweakwarp.regroupwarp
