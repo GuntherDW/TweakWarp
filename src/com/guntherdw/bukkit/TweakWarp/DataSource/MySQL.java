@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2012 GuntherDW
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 package com.guntherdw.bukkit.TweakWarp.DataSource;
 
 import com.guntherdw.bukkit.TweakWarp.TweakWarp;
@@ -24,9 +42,9 @@ public class MySQL {
     public void initConfig()
     {
         try{
-            plugin.getConfiguration().setProperty("database", "databasename");
-            plugin.getConfiguration().setProperty("username", "database-username");
-            plugin.getConfiguration().setProperty("password", "database-password");
+            plugin.getConfig().set("database", "databasename");
+            plugin.getConfig().set("username", "database-username");
+            plugin.getConfig().set("password", "database-password");
         } catch (Throwable e)
         {
             plugin.getLogger().severe("[TweakWarp] There was an exception while we were saving the config, be sure to doublecheck!");
@@ -54,10 +72,10 @@ public class MySQL {
     }
 
     public void setupConnection() {
-        this.dbhost = plugin.getConfiguration().getString("dbhost");
-        this.db =  plugin.getConfiguration().getString("database");
-        this.user = plugin.getConfiguration().getString("username");
-        this.pass = plugin.getConfiguration().getString("password");
+        this.dbhost = plugin.getConfig().getString("dbhost");
+        this.db =  plugin.getConfig().getString("database");
+        this.user = plugin.getConfig().getString("username");
+        this.pass = plugin.getConfig().getString("password");
     }
 
     public List<Warp> getAllWarps() {

@@ -1,8 +1,26 @@
+/*
+ * Copyright (c) 2012 GuntherDW
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 package com.guntherdw.bukkit.TweakWarp;
 
 import com.guntherdw.bukkit.TweakWarp.DataSource.MySQL;
 import com.guntherdw.bukkit.tweakcraft.TweakcraftUtils;
-import com.nijikokun.bukkit.Permissions.Permissions;
+// import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -25,7 +43,7 @@ public class TweakWarp extends JavaPlugin {
     public static final String DEFAULT_WARP_GROUP = "default";
     public static final String DEFAULT_ACCESS_GROUP = "";
 
-    public static Permissions perm = null;
+    // public static Permissions perm = null;
     public Map<String, WarpGroup> warps = new HashMap<String, WarpGroup>();
 
     public List<String> saveWarps = new ArrayList<String>();;
@@ -129,7 +147,7 @@ public class TweakWarp extends JavaPlugin {
     }
 
     public void onEnable() {
-        setupPermissions();
+        // setupPermissions();
         setupTCUtils();
 
         this.ds = new MySQL(this);
@@ -150,7 +168,7 @@ public class TweakWarp extends JavaPlugin {
         }
     }
 
-    public void setupPermissions() {
+    /* public void setupPermissions() {
         Plugin plugin = this.getServer().getPluginManager().getPlugin("Permissions");
 
         if (perm == null) {
@@ -162,27 +180,37 @@ public class TweakWarp extends JavaPlugin {
 
     public boolean check(Player player, String permNode) {
         if (perm == null) {
-            return true;
+            return player.isOp();
         } else {
             return player.isOp() ||
                     perm.getHandler().permission(player, permNode);
         }
+    } */
+
+    public boolean check(Player player, String permNode) {
+        /* if (perm == null) {
+            return player.isOp();
+        } else { */
+            return player.isOp() ||
+               player.hasPermission(permNode);
+        // }
     }
+
 
     public Logger getLogger() {
         return log;
     }
 
-    public boolean inGroup(Player player, String group) {
+    /* public boolean inGroup(Player player, String group) {
         if(group == null || group.trim().equals(""))
             return true;
 
         if(perm == null) {
-            return player.isOp();
+            return true;
         } else {
             return player.isOp() || perm.getHandler().inGroup(player.getWorld().getName(), player.getName(), group);
         }
-    }
+    } */
 
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings)
@@ -292,7 +320,16 @@ public class TweakWarp extends JavaPlugin {
                 warp = matchWarp(warpgroup, warpname);
             } else {
                 // String group = DEFAULT_ACCESS_GROUP;
-                List<Warp> warpList = matchWarp(warpname);
+                List<Warp> pre = matchWarp(warpname);
+                List<Warp> warpList      = new ArrayList<Warp>();
+                for(Warp w: pre) {
+                    // Check for a DIRECT hit
+                    if(w.getName().equalsIgnoreCase(warpname)) {
+                        warpList.add(w);
+                    }
+                }
+                if(warpList.size()==0) warpList=pre;
+                
                 if(warpList.size()>1){
                     String msg = ChatColor.AQUA + "Multiple warps found " + ChatColor.WHITE;
                     for(Iterator<Warp> it = warpList.iterator(); it.hasNext();){
@@ -313,11 +350,11 @@ public class TweakWarp extends JavaPlugin {
                 return true;
             }
 
-            if(!inGroup(player,warp.getAccessgroup())) {
+            /* if(!inGroup(player,warp.getAccessgroup())) {
                 log.info("[TweakWarp] "+player.getName()+" tried to warp to '"+warpname+"'!");
                 player.sendMessage(ChatColor.AQUA + "Warp not found!");
                 return true;
-            }
+            } */
 
             player.sendMessage(ChatColor.AQUA + "Found warp with name "+warp.getName());
             Location loc = warp.getLocation(getServer());
