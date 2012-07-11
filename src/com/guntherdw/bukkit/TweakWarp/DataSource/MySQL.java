@@ -21,6 +21,7 @@ package com.guntherdw.bukkit.TweakWarp.DataSource;
 import com.guntherdw.bukkit.TweakWarp.TweakWarp;
 import com.guntherdw.bukkit.TweakWarp.Warp;
 
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ public class MySQL {
             plugin.getConfig().set("database", "databasename");
             plugin.getConfig().set("username", "database-username");
             plugin.getConfig().set("password", "database-password");
+            plugin.getConfig().save(new File(plugin.getDataFolder(), "config.yml"));
         } catch (Throwable e)
         {
             plugin.getLogger().severe("[TweakWarp] There was an exception while we were saving the config, be sure to doublecheck!");
@@ -71,7 +73,7 @@ public class MySQL {
         }
     }
 
-    public void setupConnection() {
+    private void setupConnection() {
         this.dbhost = plugin.getConfig().getString("dbhost");
         this.db =  plugin.getConfig().getString("database");
         this.user = plugin.getConfig().getString("username");
@@ -236,7 +238,6 @@ public class MySQL {
             st = conn.prepareStatement("DELETE FROM `warps` WHERE `id` = ?");
             st.setInt(1, id);
             st.executeUpdate();
-            return;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -277,7 +278,6 @@ public class MySQL {
             st.setString(1, warpname);
             st.setString(2, warpgroup);
             st.executeUpdate();
-            return;
 
         } catch (SQLException e) {
             e.printStackTrace();

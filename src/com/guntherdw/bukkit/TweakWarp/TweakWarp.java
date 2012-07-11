@@ -46,7 +46,7 @@ public class TweakWarp extends JavaPlugin {
     // public static Permissions perm = null;
     public Map<String, WarpGroup> warps = new HashMap<String, WarpGroup>();
 
-    public List<String> saveWarps = new ArrayList<String>();;
+    public List<String> saveWarps = new ArrayList<String>();
     public TweakcraftUtils tweakcraftutils = null;
 
     private MySQL ds;
@@ -142,10 +142,12 @@ public class TweakWarp extends JavaPlugin {
         return ds;
     }
 
+    @Override
     public void onDisable() {
         log.info("[TweakWarp] Shutting down!");
     }
 
+    @Override
     public void onEnable() {
         // setupPermissions();
         setupTCUtils();
@@ -197,6 +199,7 @@ public class TweakWarp extends JavaPlugin {
     }
 
 
+    @Override
     public Logger getLogger() {
         return log;
     }
@@ -213,8 +216,8 @@ public class TweakWarp extends JavaPlugin {
     } */
 
 
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings)
-    {
+    @Override
+    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         String cmd = command.getName().toLowerCase();
         if(cmd.equals("listwarps")) {
             if(strings.length > 0) {

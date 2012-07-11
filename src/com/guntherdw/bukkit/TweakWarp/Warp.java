@@ -100,7 +100,7 @@ public class Warp {
     public boolean delete(TweakWarp plugin) {
         if(plugin.forgetWarp(this)) {
             // plugin.getDatabase().delete(Warp.class, this.id);
-            plugin.getDataSource().deleteWarp(name, accessgroup);
+            plugin.getDataSource().deleteWarp(name, warpgroup);
             return true;
         }
         return false;
