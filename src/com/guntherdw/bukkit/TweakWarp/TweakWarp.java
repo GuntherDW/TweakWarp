@@ -39,17 +39,21 @@ import java.util.logging.Logger;
  */
 public class TweakWarp extends JavaPlugin {
 
-    protected final static Logger log = Logger.getLogger("Minecraft");
     public static final String DEFAULT_WARP_GROUP = "default";
     public static final String DEFAULT_ACCESS_GROUP = "";
 
-    // public static Permissions perm = null;
     public Map<String, WarpGroup> warps = new HashMap<String, WarpGroup>();
 
     public List<String> saveWarps = new ArrayList<String>();
     public TweakcraftUtils tweakcraftutils = null;
 
+    private static TweakWarp instance;
+
     private MySQL ds;
+
+    protected static Logger getPluginLogger() {
+        return instance.getLogger();
+    }
 
     public boolean registerWarp(Warp warp) {
         WarpGroup group = getWarpGroup(warp.getWarpgroup());
@@ -144,7 +148,7 @@ public class TweakWarp extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        log.info("[TweakWarp] Shutting down!");
+        getLogger().info("Shutting down!");
     }
 
     @Override
@@ -152,12 +156,14 @@ public class TweakWarp extends JavaPlugin {
         // setupPermissions();
         setupTCUtils();
 
+        this.instance = this;
+
         this.ds = new MySQL(this);
         saveWarps.clear();
         // setupDatabase();
         loadAllWarps();
         PluginDescriptionFile pdfFile = this.getDescription();
-        log.info("[TweakWarp] TweakWarp v"+pdfFile.getVersion()+" enabled!");
+        getLogger().info("TweakWarp v"+pdfFile.getVersion()+" enabled!");
     }
 
     public void setupTCUtils() {
@@ -196,12 +202,6 @@ public class TweakWarp extends JavaPlugin {
             return player.isOp() ||
                player.hasPermission(permNode);
         // }
-    }
-
-
-    @Override
-    public Logger getLogger() {
-        return log;
     }
 
     /* public boolean inGroup(Player player, String group) {
@@ -261,7 +261,7 @@ public class TweakWarp extends JavaPlugin {
             }
 
             if(warp.delete(this)) {
-                log.info("[TweakWarp] Warp '"+warpname+"' removed by "+sendername+"!");
+                getLogger().info("Warp '"+warpname+"' removed by "+sendername+"!");
                 commandSender.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' removed!");
             } else {
                 commandSender.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
@@ -295,7 +295,7 @@ public class TweakWarp extends JavaPlugin {
 
             Warp tempwarp = new Warp(player.getLocation(), warpname, warpgroup, accessgroup);
             if(tempwarp.save(this)) {
-                log.info("[TweakWarp] Warp '"+warpname+"' created by "+player.getName()+"!");
+                getLogger().info("Warp '"+warpname+"' created by "+player.getName()+"!");
                 player.sendMessage(ChatColor.AQUA + "Warp '"+warpname+"' created!");
             } else {
                 player.sendMessage(ChatColor.AQUA + "An error occured, contact an admin!");
@@ -348,7 +348,7 @@ public class TweakWarp extends JavaPlugin {
             }
 
             if(warp == null) {
-                log.info("[TweakWarp] "+player.getName()+" tried to warp to '"+warpname+"'!");
+                getLogger().info(player.getName()+" tried to warp to '"+warpname+"'!");
                 player.sendMessage(ChatColor.AQUA + "Warp not found!");
                 return true;
             }
@@ -366,7 +366,7 @@ public class TweakWarp extends JavaPlugin {
             }
             player.teleport(loc);
             player.sendMessage(ChatColor.AQUA + "WHOOOSH!");
-            log.info("[TweakWarp] "+player.getName()+" warped to "+warp.getName()+"!");
+            getLogger().info(player.getName()+" warped to "+warp.getName()+"!");
 
             return true;
         } else if(cmd.equals("reloadwarps")) {
@@ -375,9 +375,9 @@ public class TweakWarp extends JavaPlugin {
                 Player player = (Player) commandSender;
                 if(!check(player, "tweakwarp.reloadwarps"))
                     return true;
-                log.info("[TweakWarp] "+player.getName()+" issued /reloadwarps!");
+                getLogger().info(player.getName()+" issued /reloadwarps!");
             } else {
-                log.info("[TweakWarp] console issued /reloadwarps!");
+                getLogger().info("console issued /reloadwarps!");
             }
 
             commandSender.sendMessage(ChatColor.GREEN + "Reloading warps table");

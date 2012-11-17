@@ -49,7 +49,7 @@ public class MySQL {
             plugin.getConfig().save(new File(plugin.getDataFolder(), "config.yml"));
         } catch (Throwable e)
         {
-            plugin.getLogger().severe("[TweakWarp] There was an exception while we were saving the config, be sure to doublecheck!");
+            plugin.getLogger().severe("There was an exception while we were saving the config, be sure to doublecheck!");
         }
     }
 

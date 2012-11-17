@@ -58,7 +58,7 @@ public class WarpGroup {
 
     public boolean registerWarp(Warp warp) {
         if(!warp.getWarpgroup().equals(getName())) {
-            TweakWarp.log.warning("[TweakWarp] trying to add warp to invalid group, warp: " + warp.getName() + "[" + warp.getWarpgroup() + "] to group " + getName() + ".");
+            TweakWarp.getPluginLogger().warning("Trying to add warp to invalid group, warp: " + warp.getName() + "[" + warp.getWarpgroup() + "] to group " + getName() + ".");
             return false;
         }
         warps.put(warp.getName().toLowerCase(), warp);
@@ -67,7 +67,7 @@ public class WarpGroup {
 
     public boolean forgetWarp(Warp warp) {
         if(!warp.getWarpgroup().equals(getName())) {
-            TweakWarp.log.warning("[TweakWarp] trying to remove warp from invalid group, warp: " + warp.getName() + "[" + warp.getWarpgroup() + "] from group " + getName() + ".");
+            TweakWarp.getPluginLogger().warning("Trying to remove warp from invalid group, warp: " + warp.getName() + "[" + warp.getWarpgroup() + "] from group " + getName() + ".");
             return false;
         }
         warps.remove(warp.getName().toLowerCase());
